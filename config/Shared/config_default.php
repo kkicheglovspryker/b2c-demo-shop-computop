@@ -160,6 +160,8 @@ $config[KernelConstants::DOMAIN_WHITELIST] = array_merge($trustedHosts, [
     $sprykerFrontendHost,
     'threedssvc.pay1.de', // trusted Payone domain
     'www.sofort.com', // trusted Payone domain
+    'www.computop-paygate.com',
+    'www.sandbox.paypal.com',
 ]);
 $config[KernelConstants::STRICT_DOMAIN_REDIRECT] = true;
 
