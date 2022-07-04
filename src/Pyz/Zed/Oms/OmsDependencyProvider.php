@@ -27,6 +27,17 @@ use Spryker\Zed\SalesInvoice\Communication\Plugin\Oms\GenerateOrderInvoiceComman
 use Spryker\Zed\SalesReturn\Communication\Plugin\Oms\Command\StartReturnCommandPlugin;
 use Spryker\Zed\Shipment\Dependency\Plugin\Oms\ShipmentManualEventGrouperPlugin;
 use Spryker\Zed\Shipment\Dependency\Plugin\Oms\ShipmentOrderMailExpanderPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Command\AuthorizePlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Command\CancelPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Command\CapturePlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Command\EasyCreditAuthorizePlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Command\RefundPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsAuthorizedPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsCancelledPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsCapturedPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsInitializedPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsPaymentConfirmedPlugin;
+use SprykerEco\Zed\Computop\Communication\Plugin\Oms\Condition\IsRefundedPlugin;
 
 class OmsDependencyProvider extends SprykerOmsDependencyProvider
 {
@@ -94,6 +105,13 @@ class OmsDependencyProvider extends SprykerOmsDependencyProvider
             $commandCollection->add(new SendEventPaymentRefundPendingPlugin(), 'Payment/SendEventPaymentRefundPending');
             $commandCollection->add(new SendEventPaymentCancelReservationPendingPlugin(), 'Payment/SendEventPaymentCancelReservationPending');
 
+            // ----- Computop
+            $commandCollection->add(new AuthorizePlugin(), 'Computop/Authorize');
+            $commandCollection->add(new CancelPlugin(), 'Computop/Cancel');
+            $commandCollection->add(new CapturePlugin(), 'Computop/Capture');
+            $commandCollection->add(new EasyCreditAuthorizePlugin(), 'Computop/EasyCreditAuthorize');
+            $commandCollection->add(new RefundPlugin(), 'Computop/Refund');
+
             return $commandCollection;
         });
 
@@ -110,6 +128,14 @@ class OmsDependencyProvider extends SprykerOmsDependencyProvider
         $container->extend(self::CONDITION_PLUGINS, function (ConditionCollectionInterface $conditionCollection) {
             $conditionCollection
             ->add(new IsGiftCardConditionPlugin(), 'GiftCard/IsGiftCard');
+
+            // ----- Computop
+            $conditionCollection->add(new IsPaymentConfirmedPlugin(), 'Computop/IsPaymentConfirmed');
+            $conditionCollection->add(new IsAuthorizedPlugin(), 'Computop/IsAuthorized');
+            $conditionCollection->add(new IsCancelledPlugin(), 'Computop/IsCancelled');
+            $conditionCollection->add(new IsCapturedPlugin(), 'Computop/IsCaptured');
+            $conditionCollection->add(new IsInitializedPlugin(), 'Computop/IsInitialized');
+            $conditionCollection->add(new IsRefundedPlugin(), 'Computop/IsRefunded');
 
             return $conditionCollection;
         });

@@ -51,7 +51,7 @@ class PayPalMapper extends AbstractMapper
 
         $computopPaymentTransfer->setData($decryptedValues[ComputopApiConfig::DATA]);
         $computopPaymentTransfer->setLen($decryptedValues[ComputopApiConfig::LENGTH]);
-        $computopPaymentTransfer->setUrl('{YVES_URL}/computop/paypal-prepare');
+        $computopPaymentTransfer->setUrl('https://yves.de.spryker.local/computop/paypal-prepare');
 
         return $computopPaymentTransfer;
     }
