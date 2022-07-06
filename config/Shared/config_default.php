@@ -70,6 +70,11 @@ use Spryker\Zed\Log\Communication\Plugin\ZedLoggerConfigPlugin;
 use Spryker\Zed\OauthAuth0\OauthAuth0Config;
 use Spryker\Zed\Payment\PaymentConfig;
 use Spryker\Zed\Propel\PropelConfig;
+use SprykerEco\Shared\Computop\ComputopConfig;
+use SprykerEco\Shared\Computop\ComputopConstants;
+use SprykerEco\Shared\ComputopApi\ComputopApiConfig;
+use SprykerEco\Shared\ComputopApi\ComputopApiConstants;
+use SprykerEco\Shared\ComputopShipment\ComputopShipmentConstants;
 use SprykerShop\Shared\CustomerPage\CustomerPageConstants;
 use SprykerShop\Shared\ShopUi\ShopUiConstants;
 
@@ -160,6 +165,8 @@ $config[KernelConstants::DOMAIN_WHITELIST] = array_merge($trustedHosts, [
     $sprykerFrontendHost,
     'threedssvc.pay1.de', // trusted Payone domain
     'www.sofort.com', // trusted Payone domain
+    'www.computop-paygate.com',
+    'www.sandbox.paypal.com',
 ]);
 $config[KernelConstants::STRICT_DOMAIN_REDIRECT] = true;
 
@@ -565,10 +572,16 @@ $config[GlueApplicationConstants::GLUE_APPLICATION_CORS_ALLOW_ORIGIN] = getenv('
 $config[OmsConstants::PROCESS_LOCATION] = [
     OmsConfig::DEFAULT_PROCESS_LOCATION,
     APPLICATION_ROOT_DIR . '/vendor/spryker/payment/config/Zed/Oms',
+    APPLICATION_ROOT_DIR . '/vendor/spryker-eco/computop/config/Zed/Oms',
 ];
-$config[OmsConstants::ACTIVE_PROCESSES] = [];
+$config[OmsConstants::ACTIVE_PROCESSES] = [
+    'ComputopPayPal01',
+    'ComputopPayPalExpress01',
+];
 $config[SalesConstants::PAYMENT_METHOD_STATEMACHINE_MAPPING] = [
     PaymentConfig::PAYMENT_FOREIGN_PROVIDER => 'B2CStateMachine01',
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL => 'ComputopPayPal01',
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL_EXPRESS => 'ComputopPayPalExpress01',
 ];
 
 // ----------------------------------------------------------------------------
@@ -618,3 +631,90 @@ $config[AppCatalogGuiConstants::OAUTH_OPTION_AUDIENCE] = 'aop-atrs';
 $config[OauthClientConstants::OAUTH_PROVIDER_NAME_FOR_PAYMENT_AUTHORIZE] = OauthAuth0Config::PROVIDER_NAME;
 $config[OauthClientConstants::OAUTH_GRANT_TYPE_FOR_PAYMENT_AUTHORIZE] = OauthAuth0Config::GRANT_TYPE_CLIENT_CREDENTIALS;
 $config[OauthClientConstants::OAUTH_OPTION_AUDIENCE_FOR_PAYMENT_AUTHORIZE] = 'aop-app';
+
+// >>> Computop
+$config[ComputopApiConstants::MERCHANT_ID] = 'spryker_test';
+$config[ComputopApiConstants::BLOWFISH_PASSWORD] = '';
+$config[ComputopApiConstants::HMAC_PASSWORD] = '';
+$config[ComputopConstants::IDEAL_ISSUER_ID] = 'IDeal issuer identifier';
+$config[ComputopConstants::PAYDIREKT_SHOP_KEY] = 'Paydirekt shop key';
+$config[ComputopConstants::PAY_PAL_CLIENT_ID] = 'AUCbr2dnrwXNkVVyrp3FW116zxrLtOHuE5V_a7cuaqjk8Y5oEgPax4C1tjeev7Yf2lN7xTWz-gGfEa7_';
+
+// Init API call endpoints
+$config[ComputopConstants::PAY_NOW_INIT_ACTION] = 'https://www.computop-paygate.com/paynow.aspx';
+$config[ComputopConstants::CREDIT_CARD_INIT_ACTION] = 'https://www.computop-paygate.com/payssl.aspx';
+$config[ComputopConstants::PAYPAL_INIT_ACTION] = 'https://www.computop-paygate.com/paypal.aspx';
+$config[ComputopConstants::DIRECT_DEBIT_INIT_ACTION] = 'https://www.computop-paygate.com/paysdd.aspx';
+$config[ComputopConstants::SOFORT_INIT_ACTION] = 'https://www.computop-paygate.com/sofort.aspx';
+$config[ComputopConstants::PAYDIREKT_INIT_ACTION] = 'https://www.computop-paygate.com/paydirekt.aspx';
+$config[ComputopConstants::IDEAL_INIT_ACTION] = 'https://www.computop-paygate.com/ideal.aspx';
+$config[ComputopConstants::EASY_CREDIT_INIT_ACTION] = 'https://www.computop-paygate.com/easyCredit.aspx';
+$config[ComputopApiConstants::PAYPAL_EXPRESS_PREPARE_ACTION] = 'https://www.computop-paygate.com/ExternalServices/paypalorders.aspx';
+
+// Post order place API calls endpoints
+$config[ComputopApiConstants::EASY_CREDIT_STATUS_ACTION] = 'https://www.computop-paygate.com/easyCreditDirect.aspx';
+$config[ComputopApiConstants::EASY_CREDIT_AUTHORIZE_ACTION] = 'https://www.computop-paygate.com/easyCreditDirect.aspx';
+$config[ComputopApiConstants::PAYPAL_EXPRESS_COMPLETE_ACTION] = 'https://www.computop-paygate.com/paypalComplete.aspx';
+$config[ComputopApiConstants::AUTHORIZE_ACTION] = 'https://www.computop-paygate.com/authorize.aspx';
+$config[ComputopApiConstants::CAPTURE_ACTION] = 'https://www.computop-paygate.com/capture.aspx';
+$config[ComputopApiConstants::REVERSE_ACTION] = 'https://www.computop-paygate.com/reverse.aspx';
+$config[ComputopApiConstants::INQUIRE_ACTION] = 'https://www.computop-paygate.com/inquire.aspx';
+$config[ComputopApiConstants::REFUND_ACTION] = 'https://www.computop-paygate.com/credit.aspx';
+
+// Payment method specific configuration
+$config[ComputopApiConstants::RESPONSE_MAC_REQUIRED] = [
+    ComputopConfig::INIT_METHOD,
+];
+$config[ComputopConstants::CREDIT_CARD_TEMPLATE_ENABLED] = false;
+$config[ComputopConstants::CREDIT_CARD_TX_TYPE] = '';
+$config[ComputopConstants::PAY_NOW_TX_TYPE] = '';
+$config[ComputopConstants::PAY_PAL_TX_TYPE] = ComputopConfig::TX_TYPE_AUTH;
+$config[ComputopConstants::PAY_PAL_EXPRESS_PAYPAL_METHOD] = ComputopConfig::PAY_PAL_EXPRESS_PAYPAL_METHOD;
+$config[ComputopConstants::PAYMENT_METHODS_WITHOUT_ORDER_CALL] = [
+    ComputopConfig::PAYMENT_METHOD_SOFORT,
+    ComputopConfig::PAYMENT_METHOD_PAYDIREKT,
+    ComputopConfig::PAYMENT_METHOD_IDEAL,
+    ComputopConfig::PAYMENT_METHOD_CREDIT_CARD,
+    ComputopConfig::PAYMENT_METHOD_PAY_NOW,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL_EXPRESS,
+    ComputopConfig::PAYMENT_METHOD_DIRECT_DEBIT,
+    ComputopConfig::PAYMENT_METHOD_EASY_CREDIT,
+];
+$config[ComputopApiConstants::PAYMENT_METHODS_CAPTURE_TYPES] = [
+    ComputopApiConfig::PAYMENT_METHOD_PAYDIREKT => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+    ComputopApiConfig::PAYMENT_METHOD_CREDIT_CARD => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+    ComputopApiConfig::PAYMENT_METHOD_PAY_NOW => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+    ComputopApiConfig::PAYMENT_METHOD_PAY_PAL => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+    ComputopApiConfig::PAYMENT_METHOD_PAY_PAL_EXPRESS => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+    ComputopApiConfig::PAYMENT_METHOD_DIRECT_DEBIT => ComputopApiConfig::CAPTURE_TYPE_MANUAL,
+];
+
+// CRIF (formerly Deltavista) configuration
+$config[ComputopConstants::CRIF_ENABLED] = false;
+$config[ComputopApiConstants::CRIF_ACTION] = 'https://www.computop-paygate.com/deltavista.aspx';
+$config[ComputopApiConstants::CRIF_PRODUCT_NAME] = ComputopConfig::CRIF_PRODUCT_NAME_QUICK_CHECK_CONSUMER;
+$config[ComputopApiConstants::CRIF_LEGAL_FORM] = ComputopConfig::CRIF_LEGAL_FORM_PERSON;
+$config[ComputopConstants::CRIF_GREEN_AVAILABLE_PAYMENT_METHODS] = [
+    ComputopConfig::PAYMENT_METHOD_SOFORT,
+    ComputopConfig::PAYMENT_METHOD_PAYDIREKT,
+    ComputopConfig::PAYMENT_METHOD_IDEAL,
+    ComputopConfig::PAYMENT_METHOD_CREDIT_CARD,
+    ComputopConfig::PAYMENT_METHOD_PAY_NOW,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL_EXPRESS,
+    ComputopConfig::PAYMENT_METHOD_DIRECT_DEBIT,
+    ComputopConfig::PAYMENT_METHOD_EASY_CREDIT,
+];
+$config[ComputopConstants::CRIF_YELLOW_AVAILABLE_PAYMENT_METHODS] = [
+    ComputopConfig::PAYMENT_METHOD_CREDIT_CARD,
+    ComputopConfig::PAYMENT_METHOD_PAY_NOW,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL,
+    ComputopConfig::PAYMENT_METHOD_PAY_PAL_EXPRESS,
+];
+$config[ComputopConstants::CRIF_RED_AVAILABLE_PAYMENT_METHODS] = [
+    ComputopConfig::PAYMENT_METHOD_CREDIT_CARD,
+    ComputopConfig::PAYMENT_METHOD_EASY_CREDIT,
+];
+
+$config[ComputopShipmentConstants::PAYPAL_EXPRESS_DEFAULT_SHIPMENT_METHOD_KEY] = 'spryker_dummy_shipment-standard';

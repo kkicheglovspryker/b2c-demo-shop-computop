@@ -2,7 +2,9 @@
 
 {# customForms data property is necessary for Eco payments integrations #}
 {% define data = {
-    customForms: {},
+    customForms: {
+        'Computop/paypal': ['paypal', 'computop'],
+    },
 } %}
 
 {% block content %}
